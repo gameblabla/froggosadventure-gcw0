@@ -1,0 +1,38 @@
+#!/bin/sh
+
+mkdir -p opk
+cp -r ./assets opk
+cp -r ./audios opk
+cp ./FroggosAdventure.pyc opk/FroggosAdventure.pyc
+cp ./icon.png opk/icon.png
+cp ./readme.txt opk/readme.txt
+
+# https://unix.stackexchange.com/questions/219268/how-to-add-new-lines-when-using-echo
+print()
+	case    ${IFS- } in
+	(\ *)   printf  %b\\n "$*";;
+	(*)     IFS=\ $IFS
+	printf  %b\\n "$*"
+	IFS=${IFS#?}
+esac
+
+
+# Create GmenuNx entry file plus other things
+
+print '[Desktop Entry]
+Type=Application
+Name=Frogs Adv
+Comment=2D Platformer
+Exec=python FroggosAdventure.pyc
+Icon=icon
+Terminal=false
+Type=Application
+X-OD-NeedsJoystick=true
+Categories=games;
+X-OD-Manual=readme.txt
+Version=10
+' > opk/default."$1".desktop
+
+mksquashfs ./opk froggosadventure_"$1".opk -all-root -noappend -no-exports -no-xattrs
+
+rm -r opk
